@@ -1,0 +1,35 @@
+# Netlify Production Configuration File
+# https://docs.netlify.com/configure-builds/file-based-configuration/
+
+[build]
+  # The directory to publish (static website root)
+  publish = "."
+  # The directory containing serverless functions
+  functions = "netlify/functions"
+
+# Custom HTTP Headers for Security & Performance
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+# Cache static assets
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Clean redirect for serverless API
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200

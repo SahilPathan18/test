@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CloudPulse - Netlify & Database Demo App</title>
+  <meta name="description" content="A modern, high-performance demo website designed for instant deployment on Netlify with full database and serverless function support.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <!-- Supabase CDN for instant database connectivity -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <div class="logo">
+        <span class="logo-icon">⚡</span>
+        <span class="logo-text">Cloud<strong>Pulse</strong></span>
+        <span class="badge badge-subtle">Demo</span>
+      </div>
+      <nav class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#interactive-demo">Live DB Board</a>
+        <a href="#serverless">Serverless</a>
+        <a href="#deploy-steps">How to Deploy</a>
+      </nav>
+      <div class="nav-actions">
+        <button id="openDbModalBtn" class="btn btn-outline btn-sm">
+          <span class="status-dot" id="navDbDot"></span>
+          <span id="navDbText">DB: Local Mode</span>
+        </button>
+        <a href="https://app.netlify.com/start" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm">
+          Deploy to Netlify 🚀
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <main>
+    <section class="hero">
+      <div class="container hero-container">
+        <div class="badge hero-badge">
+          <span class="pulse-dot"></span> Netlify Ready • Zero Configuration Needed
+        </div>
+        <h1 class="hero-title">
+          Build Fast, Deploy Instantly to <span class="gradient-text">Netlify</span> with Real-Time <span class="gradient-text-alt">Database</span>
+        </h1>
+        <p class="hero-subtitle">
+          This fully functional demo showcases automated GitHub continuous deployment, Netlify Serverless Functions, and plug-and-play cloud database integration (Supabase / Firebase / LocalStorage).
+        </p>
+
+        <div class="hero-cta-group">
+          <a href="#interactive-demo" class="btn btn-primary btn-lg">
+            Try Live Database Board
+          </a>
+          <button id="heroDbSettingsBtn" class="btn btn-secondary btn-lg">
+            ⚙️ Configure Cloud Database
+          </button>
+          <a href="https://github.com" target="_blank" class="btn btn-ghost btn-lg">
+            GitHub Ready ↗
+          </a>
+        </div>
+
+        <!-- Live Architecture Status Card -->
+        <div class="architecture-pills">
+          <div class="arch-pill">
+            <span class="icon">📦</span>
+            <div>
+              <strong>Static Frontend</strong>
+              <small>HTML5 + Modern CSS & JS</small>
+            </div>
+          </div>
+          <div class="arch-arrow">➔</div>
+          <div class="arch-pill">
+            <span class="icon">🐙</span>
+            <div>
+              <strong>GitHub Repo</strong>
+              <small>Automated Git CI/CD</small>
+            </div>
+          </div>
+          <div class="arch-arrow">➔</div>
+          <div class="arch-pill highlight">
+            <span class="icon">💎</span>
+            <div>
+              <strong>Netlify Edge</strong>
+              <small>Global CDN & Functions</small>
+            </div>
+          </div>
+          <div class="arch-arrow">➔</div>
+          <div class="arch-pill">
+            <span class="icon">🗄️</span>
+            <div>
+              <strong>Cloud DB</strong>
+              <small>Supabase / Firebase / Local</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Key Features Section -->
+    <section class="features" id="features">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">What Makes This Demo Special?</h2>
+          <p class="section-subtitle">Everything required for a production-grade Netlify project is pre-configured.</p>
+        </div>
+
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">🚀</div>
+            <h3>1-Click Netlify Deployment</h3>
+            <p>Comes with a tested <code>netlify.toml</code> containing proper redirect rules, security headers, and edge cache directives.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">💾</div>
+            <h3>Hybrid Database System</h3>
+            <p>Works immediately offline with <strong>LocalStorage</strong>, and connects instantly to <strong>Supabase (PostgreSQL)</strong> when credentials are supplied.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3>Netlify Serverless Function</h3>
+            <p>Includes an active serverless backend script at <code>netlify/functions/api.js</code> for secure backend operations and secret key isolation.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">📱</div>
+            <h3>Responsive Glassmorphic UI</h3>
+            <p>Tailored with clean typography, CSS custom properties, smooth transitions, and high visual appeal on phones, tablets, and desktops.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Database / Feedback Board Demo -->
+    <section class="interactive-demo" id="interactive-demo">
+      <div class="container">
+        <div class="demo-wrapper">
+          <div class="demo-header">
+            <div>
+              <span class="badge badge-accent">Live Interactive Demo</span>
+              <h2>Cloud Message & Task Board</h2>
+              <p>Add a note or task below. It saves instantly to your active storage engine!</p>
+            </div>
+            <div class="db-status-box">
+              <span class="db-indicator" id="boardDbIndicator"></span>
+              <span id="boardDbLabel">Mode: <strong>Local Storage</strong></span>
+              <button class="btn btn-outline btn-xs" id="switchDbBtn">Switch to Supabase</button>
+            </div>
+          </div>
+
+          <!-- Add Item Form -->
+          <form id="addItemForm" class="add-item-form">
+            <div class="form-row">
+              <div class="form-group flex-1">
+                <label for="itemAuthor">Your Name / Handle</label>
+                <input type="text" id="itemAuthor" placeholder="e.g. Alex, Developer" required maxlength="30">
+              </div>
+              <div class="form-group">
+                <label for="itemCategory">Category</label>
+                <select id="itemCategory">
+                  <option value="💡 Idea">💡 Idea</option>
+                  <option value="🚀 Deployment">🚀 Deployment</option>
+                  <option value="🗄️ Database">🗄️ Database</option>
+                  <option value="⭐ Feedback">⭐ Feedback</option>
+                  <option value="🐞 Bug Fix">🐞 Bug Fix</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="itemContent">Message / Task</label>
+              <textarea id="itemContent" rows="2" placeholder="Write something to test database persistence..." required maxlength="280"></textarea>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary" id="submitBtn">
+                <span>Post Entry</span> ➔
+              </button>
+              <button type="button" class="btn btn-ghost btn-sm" id="resetSampleDataBtn">
+                Load Sample Data
+              </button>
+            </div>
+          </form>
+
+          <!-- Filter & Count Bar -->
+          <div class="filter-bar">
+            <div class="filter-chips" id="filterChips">
+              <button class="chip active" data-filter="all">All (<span id="countAll">0</span>)</button>
+              <button class="chip" data-filter="💡 Idea">Ideas</button>
+              <button class="chip" data-filter="🚀 Deployment">Deployment</button>
+              <button class="chip" data-filter="🗄️ Database">Database</button>
+              <button class="chip" data-filter="⭐ Feedback">Feedback</button>
+            </div>
+            <button class="btn btn-text-danger btn-xs" id="clearAllItemsBtn">Clear Board</button>
+          </div>
+
+          <!-- Live Items Feed -->
+          <div class="items-grid" id="itemsFeed">
+            <!-- Dynamically populated by app.js -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Serverless Function Interactive Test -->
+    <section class="serverless-section" id="serverless">
+      <div class="container">
+        <div class="serverless-card">
+          <div class="serverless-info">
+            <span class="badge">Netlify Functions</span>
+            <h2>Test Your Serverless Backend</h2>
+            <p>
+              Netlify automatically deploys any JavaScript/TypeScript file in <code>netlify/functions/</code> as an AWS Lambda serverless endpoint accessible at <code>/.netlify/functions/[filename]</code>.
+            </p>
+            <div class="function-features">
+              <div>✓ No server maintenance</div>
+              <div>✓ Secure API keys hidden from client</div>
+              <div>✓ Automatic scaling on Netlify Edge</div>
+            </div>
+            <div class="serverless-actions">
+              <button id="testFunctionBtn" class="btn btn-primary">
+                ⚡ Ping <code>/.netlify/functions/api</code>
+              </button>
+            </div>
+          </div>
+          <div class="terminal-box">
+            <div class="terminal-header">
+              <span class="terminal-circle red"></span>
+              <span class="terminal-circle yellow"></span>
+              <span class="terminal-circle green"></span>
+              <span class="terminal-title">Serverless Response Inspector</span>
+            </div>
+            <pre class="terminal-body" id="functionResponseOutput">// Click "Ping /.netlify/functions/api" to test the live endpoint.
+// When hosted on Netlify, this executes your serverless backend code.
+// When testing locally without Netlify CLI, a mock response will simulate it.</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Step by Step Quick Guide on Page -->
+    <section class="deploy-steps" id="deploy-steps">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">3 Steps to Take This Live</h2>
+          <p class="section-subtitle">Full details are also included in your companion PDF guide.</p>
+        </div>
+
+        <div class="steps-grid">
+          <div class="step-card">
+            <div class="step-number">01</div>
+            <h3>Upload to GitHub</h3>
+            <p>Initialize git, commit these files, and push to your GitHub account repository.</p>
+            <div class="step-code">
+              <code>git init<br>git add .<br>git commit -m "Initial commit"<br>git push -u origin main</code>
+            </div>
+          </div>
+
+          <div class="step-card">
+            <div class="step-number">02</div>
+            <h3>Link with Netlify</h3>
+            <p>Log in to <a href="https://app.netlify.com" target="_blank">Netlify</a>, select <strong>"Add new site" ➔ "Import an existing project"</strong>, and pick your GitHub repo.</p>
+            <div class="step-code">
+              <code>Build command: (leave blank)<br>Publish directory: .</code>
+            </div>
+          </div>
+
+          <div class="step-card">
+            <div class="step-number">03</div>
+            <h3>Connect Database</h3>
+            <p>Create a free Supabase or Firebase project, create a table, and paste the URL & Key in Netlify Environment Variables.</p>
+            <div class="step-code">
+              <code>SUPABASE_URL=https://xyz.supabase.co<br>SUPABASE_ANON_KEY=eyJhbGci...</code>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Database Configuration Modal -->
+  <div class="modal-backdrop" id="dbModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <h3>🗄️ Database Configuration</h3>
+          <p>Switch between LocalStorage and Cloud Database (Supabase)</p>
+        </div>
+        <button class="modal-close" id="closeDbModalBtn">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="db-choice-toggle">
+          <button class="toggle-option active" id="useLocalBtn">Local Storage (No Setup)</button>
+          <button class="toggle-option" id="useSupabaseBtn">Supabase (PostgreSQL Cloud)</button>
+        </div>
+
+        <div id="supabaseConfigFields" class="supabase-fields hidden">
+          <p class="field-hint">
+            To connect a live cloud database, create a free project at <a href="https://supabase.com" target="_blank">supabase.com</a> and paste your credentials below:
+          </p>
+          <div class="form-group">
+            <label for="supabaseUrlInput">Supabase Project URL</label>
+            <input type="url" id="supabaseUrlInput" placeholder="https://your-project-id.supabase.co">
+          </div>
+          <div class="form-group">
+            <label for="supabaseKeyInput">Supabase Anon / Public Key</label>
+            <input type="password" id="supabaseKeyInput" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+          </div>
+
+          <div class="sql-box">
+            <div class="sql-box-header">
+              <span>SQL Schema to Run in Supabase SQL Editor:</span>
+              <button class="btn btn-outline btn-xs" id="copySqlBtn">Copy SQL</button>
+            </div>
+            <pre id="sqlCode">CREATE TABLE messages (
+  id BIGINT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  author TEXT NOT NULL,
+  category TEXT NOT NULL,
+  content TEXT NOT NULL,
+  likes INT DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Enable public read/write for demo
+ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public Read/Write" ON messages FOR ALL USING (true) WITH CHECK (true);</pre>
+          </div>
+        </div>
+
+        <div id="localConfigFields" class="local-fields">
+          <div class="info-alert">
+            <strong>Local Storage Active:</strong> Data is currently stored directly in your browser. It persists across refreshes and requires zero setup. Ready for immediate testing!
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-ghost" id="cancelDbModalBtn">Cancel</button>
+        <button class="btn btn-primary" id="saveDbConfigBtn">Save & Apply Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast"></div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-container">
+      <div class="footer-left">
+        <div class="logo">
+          <span class="logo-icon">⚡</span>
+          <span class="logo-text">Cloud<strong>Pulse</strong></span>
+        </div>
+        <p>Built for instant deployment on Netlify with automated GitHub workflows.</p>
+      </div>
+      <div class="footer-right">
+        <a href="https://docs.netlify.com" target="_blank">Netlify Docs</a>
+        <a href="https://supabase.com/docs" target="_blank">Supabase Docs</a>
+        <a href="https://github.com" target="_blank">GitHub</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
